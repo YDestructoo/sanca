@@ -2,6 +2,8 @@ import { Stack } from "expo-router";
 import { ThemeProvider } from "@react-navigation/native";
 import { NAV_THEME } from "../lib/theme";
 import { useColorScheme } from "react-native";
+import { PortalHost } from '@rn-primitives/portal';
+import "@/global.css";
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
@@ -14,6 +16,7 @@ export default function RootLayout() {
         <Stack.Screen name="auth/register" />
         <Stack.Screen name="(tabs)" />
       </Stack>
+      <PortalHost />
     </ThemeProvider>
   );
 }

@@ -56,8 +56,8 @@ The ESP32 sends data to Firebase, and the mobile app displays student locations 
 |                  | school_id: String                                      |
 |                  | device_id: String                                      |
 |                  | guardian_ids: Array                                    |
-|                  | location_logs: Sub-collection (lat, lng, timestamp)     |
-|                  | voice_logs: Sub-collection (file_url, timestamp)        |
+|                  | location_logs: Sub-collection (lat, lng, timestamp)    |
+|                  | voice_logs: Sub-collection (file_url, timestamp)       |
 
 ---
 
