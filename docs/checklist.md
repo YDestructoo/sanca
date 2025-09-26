@@ -2,6 +2,10 @@
 
 A complete checklist to track progress for the Sanca student tracking system.
 
+[+] Completed  
+[~] In Progress  
+[ ] Not Started  
+
 ---
 
 ## Phase 1: Project Setup
@@ -18,20 +22,20 @@ A complete checklist to track progress for the Sanca student tracking system.
 ---
 
 ## Phase 2: Frontend (React Native + Expo)
-- [ ] **Environment Setup**
+- [+] **Environment Setup**
   - [+] Install Expo Router
   - [+] Install ReactNativeReusables UI library (Shad/cn for mobile)
-  - [ ] Install Google Maps SDK, Expo Location, Expo AV
+  - [+] Install Google Maps SDK, Expo Location, Expo AV
 
 - [+] **Navigation**
   - [+] Set up `app/_layout.tsx` for stack navigation
   - [+] Add pages: `index.tsx`, `map.tsx`, `logs.tsx`, `settings.tsx`, `student.tsx`
 
-- [ ] **Core Components**
-  - [ ] Auth | Log-in & Register
-  - [ ] Map Screen (Google Maps + real-time markers)
-  - [ ] Logs Screen (Location + Voice History)
-  - [ ] Settings Screen (API keys, backend URL) & Student Details Screen (info + recent activity(Optional))
+- [~] **Core Components**
+  - [~] Auth | Log-in & Register
+  - [~] Map Screen (Google Maps + real-time markers)
+  - [~] Logs Screen (Location + Voice History)
+  - [~] Settings Screen (API keys, backend URL) & Student Details Screen (info + recent activity(Optional))
 
 - [ ] **Integrations**
   - [ ] Firebase Auth for guardian/teacher login
