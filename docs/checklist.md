@@ -6,34 +6,32 @@ A complete checklist to track progress for the Sanca student tracking system.
 
 ## Phase 1: Project Setup
 - [ ] **Install Prerequisites**
-  - [ ] Node.js LTS installed
-  - [ ] Expo CLI installed
+  - [+] Node.js LTS installed
   - [ ] Firebase project created (Firestore, Auth, Storage enabled)
   - [ ] Google Maps API Key generated
 
-- [ ] **Project Initialization**
-  - [ ] Create project folder `sanca/`
-  - [ ] Initialize Git repository
-  - [ ] Create `frontend/`, `backend/`, `shared/` folders
+- [+] **Project Initialization**
+  - [+] Create project folder `sanca/`
+  - [+] Initialize Git repository
+  - [+] Create `frontend/`, `backend/`, `shared/` folders
 
 ---
 
 ## Phase 2: Frontend (React Native + Expo)
 - [ ] **Environment Setup**
-  - [ ] Install Expo Router
-  - [ ] Install ReactNativeReusables UI library (Shad/cn for mobile)
+  - [+] Install Expo Router
+  - [+] Install ReactNativeReusables UI library (Shad/cn for mobile)
   - [ ] Install Google Maps SDK, Expo Location, Expo AV
 
-- [ ] **Navigation**
-  - [ ] Set up `app/_layout.tsx` for stack navigation
-  - [ ] Add pages: `index.tsx`, `map.tsx`, `logs.tsx`, `settings.tsx`, `student.tsx`
+- [+] **Navigation**
+  - [+] Set up `app/_layout.tsx` for stack navigation
+  - [+] Add pages: `index.tsx`, `map.tsx`, `logs.tsx`, `settings.tsx`, `student.tsx`
 
 - [ ] **Core Components**
-  - [ ] Home Screen with quick actions
+  - [ ] Auth | Log-in & Register
   - [ ] Map Screen (Google Maps + real-time markers)
   - [ ] Logs Screen (Location + Voice History)
-  - [ ] Settings Screen (API keys, backend URL)
-  - [ ] Student Details Screen (info + recent activity)
+  - [ ] Settings Screen (API keys, backend URL) & Student Details Screen (info + recent activity(Optional))
 
 - [ ] **Integrations**
   - [ ] Firebase Auth for guardian/teacher login
