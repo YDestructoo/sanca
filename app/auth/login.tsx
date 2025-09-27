@@ -1,17 +1,16 @@
 import React, { useState } from "react";
 import { View, ScrollView, KeyboardAvoidingView, Platform, Pressable } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-
-// React Native Reusables imports
 import { Text } from "@/components/ui/text";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
-// Icons (assuming you have lucide-react-native or similar)
 import { Eye, EyeOff, ArrowRight, LogIn } from "lucide-react-native";
+
+// Firebase imports
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "@/firebaseConfig"; // Adjust this path if needed
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
@@ -31,11 +30,13 @@ export default function LoginScreen() {
     setError("");
 
     try {
-      // Mock logic: store token for logged-in state
-      await AsyncStorage.setItem("auth_token", "mock_token");
+      // Sign in using Firebase Auth
+      await signInWithEmailAndPassword(auth, email, password);
+
+      // Redirect to main screen after login
       router.replace("/map");
-    } catch (err) {
-      setError("Login failed. Please try again.");
+    } catch (err: any) {
+      setError("Invalid email or password");
     } finally {
       setIsLoading(false);
     }
@@ -50,12 +51,15 @@ export default function LoginScreen() {
         <ScrollView
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', alignItems: 'center', paddingVertical: 24 }}
+          contentContainerStyle={{
+            flexGrow: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            paddingVertical: 24,
+          }}
         >
-          {/* Header Section */}
           <View className="w-full px-6">
-            
-            {/* Logo/Brand Area */}
+            {/* Header Section */}
             <View className="items-center mb-4">
               <View className="w-24 h-24 rounded-3xl bg-primary items-center justify-center shadow-lg mb-5">
                 <LogIn className="text-primary-foreground" size={36} />
@@ -67,11 +71,11 @@ export default function LoginScreen() {
             </View>
 
             {/* Main Card */}
-            <Card className="w-full shadow-lg" style={{ alignSelf: 'center', width: '100%', maxWidth: 480 }}>
-              <CardHeader className="Sign In">
+            <Card className="w-full shadow-lg" style={{ alignSelf: "center", width: "100%", maxWidth: 480 }}>
+              <CardHeader>
                 <CardTitle className="text-2xl text-center text-foreground">Sign In</CardTitle>
               </CardHeader>
-              
+
               <CardContent className="space-y-2">
                 {/* Error Message */}
                 {error ? (
@@ -83,18 +87,16 @@ export default function LoginScreen() {
                 {/* Email Input */}
                 <View className="space-y-2">
                   <Text className="text-foreground font-medium text-base left-2">Email</Text>
-                  <View className="relative">
-                    <Input
-                      placeholder="Enter your email"
-                      value={email}
-                      onChangeText={setEmail}
-                      keyboardType="email-address"
-                      autoCapitalize="none"
-                      autoComplete="email"
-                      textContentType="emailAddress"
-                      className="h-12 pl-4 text-base bg-card border-border focus:border-ring"
-                    />
-                  </View>
+                  <Input
+                    placeholder="Enter your email"
+                    value={email}
+                    onChangeText={setEmail}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    autoComplete="email"
+                    textContentType="emailAddress"
+                    className="h-12 pl-4 text-base bg-card border-border focus:border-ring"
+                  />
                 </View>
 
                 {/* Password Input */}
@@ -126,22 +128,17 @@ export default function LoginScreen() {
                 {/* Forgot Password */}
                 <View className="items-start">
                   <Pressable>
-                    <Text className="text-primary font-medium left-2.5  top-1">Forgot Password?</Text>
+                    <Text className="text-primary font-medium left-2.5 top-1">Forgot Password?</Text>
                   </Pressable>
                 </View>
 
                 {/* Login Button */}
-                <Button
-                  onPress={handleLogin}
-                  disabled={isLoading}
-                  className="h-12 mt-3.5"
-                  size="lg"
-                >
+                <Button onPress={handleLogin} disabled={isLoading} className="h-12 mt-3.5" size="lg">
                   <View className="flex-row items-center">
                     <Text className="text-primary-foreground font-semibold text-base mr-2">
                       {isLoading ? "Signing In..." : "Sign In"}
                     </Text>
-                    {!isLoading && <ArrowRight size={16} className="text-primary-foreground color" />}
+                    {!isLoading && <ArrowRight size={16} className="text-primary-foreground" />}
                   </View>
                 </Button>
               </CardContent>

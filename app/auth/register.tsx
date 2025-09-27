@@ -1,17 +1,17 @@
 import React, { useState } from "react";
 import { View, ScrollView, KeyboardAvoidingView, Platform, Pressable } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-
-// React Native Reusables imports
 import { Text } from "@/components/ui/text";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
-// Icons
 import { Eye, EyeOff, ArrowRight, UserPlus, Key } from "lucide-react-native";
+
+// Firebase imports
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
+import { auth, db } from "@/firebaseConfig"; // adjust path if needed
 
 export default function RegisterScreen() {
   const [username, setUsername] = useState("");
@@ -35,11 +35,22 @@ export default function RegisterScreen() {
     setError("");
 
     try {
-      // Mock logic: store token to simulate login after registration
-      await AsyncStorage.setItem("auth_token", "mock_token");
+      // Create user in Firebase Auth
+      const userCred = await createUserWithEmailAndPassword(auth, email, password);
+
+      // Save additional info to Firestore
+      await setDoc(doc(db, "users", userCred.user.uid), {
+        username,
+        email,
+        studentName,
+        adminToken: token,
+        createdAt: new Date()
+      });
+
+      // Navigate to main map page
       router.replace("/map");
-    } catch (err) {
-      setError("Registration failed. Please try again.");
+    } catch (err: any) {
+      setError(err.message);
     } finally {
       setIsLoading(false);
     }
@@ -56,10 +67,8 @@ export default function RegisterScreen() {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', alignItems: 'center', paddingVertical: 24 }}
         >
-          {/* Header Section */}
           <View className="w-full px-6">
-            
-            {/* Logo/Brand Area */}
+            {/* Header Section */}
             <View className="items-center mb-4">
               <View className="w-24 h-24 rounded-3xl bg-primary items-center justify-center shadow-lg mb-5">
                 <UserPlus className="text-primary-foreground" size={36} />
@@ -75,64 +84,57 @@ export default function RegisterScreen() {
               <CardHeader>
                 <CardTitle className="text-2xl text-center text-foreground">Sign Up</CardTitle>
               </CardHeader>
-              
+
               <CardContent className="space-y-2">
-                {/* Error Message */}
                 {error ? (
                   <View className="bg-destructive/10 border border-destructive/20 rounded-lg px-4 py-3 mb-2">
                     <Text className="text-destructive text-sm text-center font-medium">{error}</Text>
                   </View>
                 ) : null}
 
-                {/* Username Input */}
+                {/* Username */}
                 <View className="space-y-2">
                   <Text className="text-foreground font-medium text-base left-2">Username</Text>
-                  <View className="relative">
-                    <Input
-                      placeholder="Choose a username"
-                      value={username}
-                      onChangeText={setUsername}
-                      autoCapitalize="none"
-                      autoComplete="username"
-                      textContentType="username"
-                      className="h-12 pl-4 text-base bg-card border-border focus:border-ring"
-                    />
-                  </View>
+                  <Input
+                    placeholder="Choose a username"
+                    value={username}
+                    onChangeText={setUsername}
+                    autoCapitalize="none"
+                    autoComplete="username"
+                    textContentType="username"
+                    className="h-12 pl-4 text-base bg-card border-border focus:border-ring"
+                  />
                 </View>
 
-                {/* Email Input */}
+                {/* Email */}
                 <View className="space-y-2">
                   <Text className="text-foreground font-medium text-base left-2">Gmail</Text>
-                  <View className="relative">
-                    <Input
-                      placeholder="Enter your Gmail address"
-                      value={email}
-                      onChangeText={setEmail}
-                      keyboardType="email-address"
-                      autoCapitalize="none"
-                      autoComplete="email"
-                      textContentType="emailAddress"
-                      className="h-12 pl-4 text-base bg-card border-border focus:border-ring"
-                    />
-                  </View>
+                  <Input
+                    placeholder="Enter your Gmail address"
+                    value={email}
+                    onChangeText={setEmail}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    autoComplete="email"
+                    textContentType="emailAddress"
+                    className="h-12 pl-4 text-base bg-card border-border focus:border-ring"
+                  />
                 </View>
 
-                {/* Student Name Input */}
+                {/* Student Name */}
                 <View className="space-y-2">
                   <Text className="text-foreground font-medium text-base left-2">Student Name</Text>
-                  <View className="relative">
-                    <Input
-                      placeholder="Enter your full name"
-                      value={studentName}
-                      onChangeText={setStudentName}
-                      autoComplete="name"
-                      textContentType="name"
-                      className="h-12 pl-4 text-base bg-card border-border focus:border-ring"
-                    />
-                  </View>
+                  <Input
+                    placeholder="Enter your full name"
+                    value={studentName}
+                    onChangeText={setStudentName}
+                    autoComplete="name"
+                    textContentType="name"
+                    className="h-12 pl-4 text-base bg-card border-border focus:border-ring"
+                  />
                 </View>
 
-                {/* Password Input */}
+                {/* Password */}
                 <View className="space-y-2 mt-2">
                   <Text className="text-foreground font-medium text-base left-2">Password</Text>
                   <View className="relative">
@@ -158,7 +160,7 @@ export default function RegisterScreen() {
                   </View>
                 </View>
 
-                {/* Admin Token Input */}
+                {/* Admin Token */}
                 <View className="space-y-2 mt-2">
                   <Text className="text-foreground font-medium text-base left-2">Admin Token</Text>
                   <View className="relative">
@@ -199,33 +201,6 @@ export default function RegisterScreen() {
                 </Button>
               </CardContent>
             </Card>
-
-            {/* Bottom Section */}
-            <View className="mt-7">
-              {/* Divider */}
-              <View className="flex-row items-center my-8">
-                <View className="flex-1 h-px bg-border" />
-                <Text className="mx-4 text-muted-foreground text-sm">already have an account?</Text>
-                <View className="flex-1 h-px bg-border" />
-              </View>
-
-              {/* Login Button */}
-              <Button
-                variant="outline"
-                onPress={() => router.push("/auth/login")}
-                className="h-12"
-                size="lg"
-              >
-                <Text className="font-semibold text-base">Sign In Instead</Text>
-              </Button>
-
-              {/* Terms */}
-              <Text className="text-xs text-muted-foreground text-center mt-6 px-4 leading-4">
-                By creating an account, you agree to our{" "}
-                <Text className="text-primary">Terms of Service</Text> and{" "}
-                <Text className="text-primary">Privacy Policy</Text>
-              </Text>
-            </View>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>

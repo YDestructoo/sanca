@@ -1,6 +1,9 @@
 import React from "react";
 import { View, ScrollView, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { signOut } from "firebase/auth";
+import { auth } from "@/firebaseConfig";
+import { useRouter } from "expo-router";
 
 // React Native Reusables imports
 import { Text } from "@/components/ui/text";
@@ -25,11 +28,16 @@ export default function SettingsScreen() {
     console.log("Change Password clicked");
     // TODO: Implement password change
   };
+  const router = useRouter();
 
-  const handleLogout = () => {
-    console.log("Logout clicked");
-    // TODO: Implement logout
-  };
+    const handleLogout = async () => {
+      try {
+        await signOut(auth);
+        router.replace("/auth/login"); // send back to login page
+      } catch (error) {
+        console.log("Logout error:", error);
+      }
+    };
 
   return (
     <SafeAreaView className="flex-1 bg-background">

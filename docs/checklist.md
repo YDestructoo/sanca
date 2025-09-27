@@ -11,8 +11,8 @@ A complete checklist to track progress for the Sanca student tracking system.
 ## Phase 1: Project Setup
 - [ ] **Install Prerequisites**
   - [+] Node.js LTS installed
-  - [ ] Firebase project created (Firestore, Auth, Storage enabled)
-  - [ ] Google Maps API Key generated
+  - [+] Firebase project created (Firestore, Auth, Storage enabled)
+  - [+] Google Maps API Key generated
 
 - [+] **Project Initialization**
   - [+] Create project folder `sanca/`
