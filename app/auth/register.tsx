@@ -1,7 +1,17 @@
 import React, { useState } from "react";
-import { View, TextInput, Button, Text } from "react-native";
+import { View, ScrollView, KeyboardAvoidingView, Platform, Pressable } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
+
+// React Native Reusables imports
+import { Text } from "@/components/ui/text";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+// Icons
+import { Eye, EyeOff, ArrowRight, UserPlus, Key } from "lucide-react-native";
 
 export default function RegisterScreen() {
   const [username, setUsername] = useState("");
@@ -10,6 +20,9 @@ export default function RegisterScreen() {
   const [token, setToken] = useState("");
   const [studentName, setStudentName] = useState("");
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showToken, setShowToken] = useState(false);
   const router = useRouter();
 
   const handleRegister = async () => {
@@ -18,22 +31,204 @@ export default function RegisterScreen() {
       return;
     }
 
-    // Mock logic: store token to simulate login after registration
-    await AsyncStorage.setItem("auth_token", "mock_token");
-    router.replace("/map");
+    setIsLoading(true);
+    setError("");
+
+    try {
+      // Mock logic: store token to simulate login after registration
+      await AsyncStorage.setItem("auth_token", "mock_token");
+      router.replace("/map");
+    } catch (err) {
+      setError("Registration failed. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <View style={{ padding: 20 }}>
-      <Text>Register</Text>
-      <TextInput placeholder="Username" value={username} onChangeText={setUsername} />
-      <TextInput placeholder="Gmail" value={email} onChangeText={setEmail} />
-      <TextInput placeholder="Password" secureTextEntry value={password} onChangeText={setPassword} />
-      <TextInput placeholder="Admin Token" value={token} onChangeText={setToken} />
-      <TextInput placeholder="Student Name" value={studentName} onChangeText={setStudentName} />
-      {error ? <Text style={{ color: "red" }}>{error}</Text> : null}
-      <Button title="Register" onPress={handleRegister} />
-      <Button title="Go to Log-in" onPress={() => router.push("/auth/login")} />
-    </View>
+    <SafeAreaView className="flex-1 bg-background">
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        className="flex-1"
+      >
+        <ScrollView
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', alignItems: 'center', paddingVertical: 24 }}
+        >
+          {/* Header Section */}
+          <View className="w-full px-6">
+            
+            {/* Logo/Brand Area */}
+            <View className="items-center mb-4">
+              <View className="w-24 h-24 rounded-3xl bg-primary items-center justify-center shadow-lg mb-5">
+                <UserPlus className="text-primary-foreground" size={36} />
+              </View>
+              <Text className="text-4xl font-bold text-foreground mb-2 text-center">Create Account</Text>
+              <Text className="text-muted-foreground text-center text-lg px-4 leading-6">
+                Join us to start your journey
+              </Text>
+            </View>
+
+            {/* Main Card */}
+            <Card className="w-full shadow-lg" style={{ alignSelf: 'center', width: '100%', maxWidth: 480 }}>
+              <CardHeader>
+                <CardTitle className="text-2xl text-center text-foreground">Sign Up</CardTitle>
+              </CardHeader>
+              
+              <CardContent className="space-y-2">
+                {/* Error Message */}
+                {error ? (
+                  <View className="bg-destructive/10 border border-destructive/20 rounded-lg px-4 py-3 mb-2">
+                    <Text className="text-destructive text-sm text-center font-medium">{error}</Text>
+                  </View>
+                ) : null}
+
+                {/* Username Input */}
+                <View className="space-y-2">
+                  <Text className="text-foreground font-medium text-base left-2">Username</Text>
+                  <View className="relative">
+                    <Input
+                      placeholder="Choose a username"
+                      value={username}
+                      onChangeText={setUsername}
+                      autoCapitalize="none"
+                      autoComplete="username"
+                      textContentType="username"
+                      className="h-12 pl-4 text-base bg-card border-border focus:border-ring"
+                    />
+                  </View>
+                </View>
+
+                {/* Email Input */}
+                <View className="space-y-2">
+                  <Text className="text-foreground font-medium text-base left-2">Gmail</Text>
+                  <View className="relative">
+                    <Input
+                      placeholder="Enter your Gmail address"
+                      value={email}
+                      onChangeText={setEmail}
+                      keyboardType="email-address"
+                      autoCapitalize="none"
+                      autoComplete="email"
+                      textContentType="emailAddress"
+                      className="h-12 pl-4 text-base bg-card border-border focus:border-ring"
+                    />
+                  </View>
+                </View>
+
+                {/* Student Name Input */}
+                <View className="space-y-2">
+                  <Text className="text-foreground font-medium text-base left-2">Student Name</Text>
+                  <View className="relative">
+                    <Input
+                      placeholder="Enter your full name"
+                      value={studentName}
+                      onChangeText={setStudentName}
+                      autoComplete="name"
+                      textContentType="name"
+                      className="h-12 pl-4 text-base bg-card border-border focus:border-ring"
+                    />
+                  </View>
+                </View>
+
+                {/* Password Input */}
+                <View className="space-y-2 mt-2">
+                  <Text className="text-foreground font-medium text-base left-2">Password</Text>
+                  <View className="relative">
+                    <Input
+                      placeholder="Create a secure password"
+                      secureTextEntry={!showPassword}
+                      value={password}
+                      onChangeText={setPassword}
+                      autoComplete="new-password"
+                      textContentType="newPassword"
+                      className="h-12 pl-4 pr-10 text-base bg-card border-border focus:border-ring"
+                    />
+                    <Pressable
+                      onPress={() => setShowPassword(!showPassword)}
+                      className="absolute right-4 top-3.5"
+                    >
+                      {showPassword ? (
+                        <EyeOff size={20} className="text-muted-foreground" />
+                      ) : (
+                        <Eye size={20} className="text-muted-foreground" />
+                      )}
+                    </Pressable>
+                  </View>
+                </View>
+
+                {/* Admin Token Input */}
+                <View className="space-y-2 mt-2">
+                  <Text className="text-foreground font-medium text-base left-2">Admin Token</Text>
+                  <View className="relative">
+                    <Input
+                      placeholder="Enter admin token"
+                      secureTextEntry={!showToken}
+                      value={token}
+                      onChangeText={setToken}
+                      autoCapitalize="none"
+                      className="h-12 pl-4 pr-10 text-base bg-card border-border focus:border-ring"
+                    />
+                    <Pressable
+                      onPress={() => setShowToken(!showToken)}
+                      className="absolute right-4 top-3.5"
+                    >
+                      {showToken ? (
+                        <Key size={20} className="text-muted-foreground" />
+                      ) : (
+                        <Key size={20} className="text-muted-foreground opacity-60" />
+                      )}
+                    </Pressable>
+                  </View>
+                </View>
+
+                {/* Register Button */}
+                <Button
+                  onPress={handleRegister}
+                  disabled={isLoading}
+                  className="h-12 mt-3.5"
+                  size="lg"
+                >
+                  <View className="flex-row items-center">
+                    <Text className="text-primary-foreground font-semibold text-base mr-2">
+                      {isLoading ? "Creating Account..." : "Create Account"}
+                    </Text>
+                    {!isLoading && <ArrowRight size={16} className="text-primary-foreground" />}
+                  </View>
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Bottom Section */}
+            <View className="mt-7">
+              {/* Divider */}
+              <View className="flex-row items-center my-8">
+                <View className="flex-1 h-px bg-border" />
+                <Text className="mx-4 text-muted-foreground text-sm">already have an account?</Text>
+                <View className="flex-1 h-px bg-border" />
+              </View>
+
+              {/* Login Button */}
+              <Button
+                variant="outline"
+                onPress={() => router.push("/auth/login")}
+                className="h-12"
+                size="lg"
+              >
+                <Text className="font-semibold text-base">Sign In Instead</Text>
+              </Button>
+
+              {/* Terms */}
+              <Text className="text-xs text-muted-foreground text-center mt-6 px-4 leading-4">
+                By creating an account, you agree to our{" "}
+                <Text className="text-primary">Terms of Service</Text> and{" "}
+                <Text className="text-primary">Privacy Policy</Text>
+              </Text>
+            </View>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }

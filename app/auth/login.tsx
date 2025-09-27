@@ -50,24 +50,24 @@ export default function LoginScreen() {
         <ScrollView
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
-          className="flex-1"
+          contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', alignItems: 'center', paddingVertical: 24 }}
         >
           {/* Header Section */}
-          <View className="flex-1 justify-center px-6 py-8">
+          <View className="w-full px-6">
             
             {/* Logo/Brand Area */}
-            <View className="items-center mb-3">
-              <View className="w-20 h-20 rounded-2xl bg-primary items-center justify-center shadow-lg mb-6">
-                <LogIn className="text-primary-foreground" size={32} />
+            <View className="items-center mb-4">
+              <View className="w-24 h-24 rounded-3xl bg-primary items-center justify-center shadow-lg mb-5">
+                <LogIn className="text-primary-foreground" size={36} />
               </View>
-              <Text className="text-4xl font-bold text-foreground mb-3">Welcome Back</Text>
+              <Text className="text-4xl font-bold text-foreground mb-2 text-center">Welcome Back</Text>
               <Text className="text-muted-foreground text-center text-lg px-4 leading-6">
                 Sign in to continue your journey
               </Text>
             </View>
 
             {/* Main Card */}
-            <Card className="w-full shadow-lg">
+            <Card className="w-full shadow-lg" style={{ alignSelf: 'center', width: '100%', maxWidth: 480 }}>
               <CardHeader className="Sign In">
                 <CardTitle className="text-2xl text-center text-foreground">Sign In</CardTitle>
               </CardHeader>
