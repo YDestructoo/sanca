@@ -194,7 +194,7 @@ export default function MapScreen() {
           <RefreshCw className="text-foreground" size={20} />
         </Pressable>
 
-        <Pressable className="w-12 h-12 rounded-full bg-card shadow-lg border border-border items-center justify-center">
+        <Pressable className="w-12 h-12 rounded-full bg-card shadow-lg border border-border items-center justify-center mt-2">
           <Navigation className="text-foreground" size={20} />
         </Pressable>
       </View>
