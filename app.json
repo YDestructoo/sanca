@@ -24,6 +24,12 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
+      },
+      "package": "com.sanca",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyCJnQrYhw_yYyqU1TBIjE4t7kN1JEii10g"
+        }
       }
     },
     "web": {
@@ -36,6 +42,12 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "7946998b-ab77-445e-bf3f-6f6f9817109c"
+      }
     }
   }
 }

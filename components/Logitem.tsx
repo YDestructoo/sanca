@@ -81,20 +81,6 @@ export default function LogItem({ time, location, date, duration, onPlay }: LogI
               </View>
             )}
           </View>
-          
-          <View className="flex-row items-center">
-            {/* Play Button - subtle rounded square */}
-            <Pressable
-              onPress={onPlay}
-              accessibilityRole="button"
-              className="w-12 h-12 items-center justify-center shadow-sm active:scale-95 bg-card border border-border rounded-lg"
-              style={{
-                borderRadius: 12,
-              }}
-            >
-              <Play className="text-primary" size={18} />
-            </Pressable>
-          </View>
         </View>
       </CardContent>
     </Card>

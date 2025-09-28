@@ -10,7 +10,7 @@ import { Eye, EyeOff, ArrowRight, UserPlus, Key } from "lucide-react-native";
 
 // Firebase imports
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { auth, db } from "@/firebaseConfig"; // adjust path if needed
 
 export default function RegisterScreen() {
@@ -35,19 +35,36 @@ export default function RegisterScreen() {
     setError("");
 
     try {
-      // Create user in Firebase Auth
+      // 1. Check if token exists & is valid
+      const tokenRef = doc(db, "adminTokens", token);
+      const tokenSnap = await getDoc(tokenRef);
+
+      if (!tokenSnap.exists() || !tokenSnap.data().active || tokenSnap.data().assigned) {
+        setError("Invalid or already used token");
+        setIsLoading(false);
+        return;
+      }
+
+      // 2. Create user in Firebase Auth
       const userCred = await createUserWithEmailAndPassword(auth, email, password);
 
-      // Save additional info to Firestore
+      // 3. Save user details in 'users' collection
       await setDoc(doc(db, "users", userCred.user.uid), {
         username,
         email,
         studentName,
         adminToken: token,
+        role: "student",
         createdAt: new Date()
       });
 
-      // Navigate to main map page
+      // 4. Mark token as assigned with Gmail info
+      await updateDoc(tokenRef, {
+        assigned: true,
+        assignedTo: email
+      });
+
+      // 5. Navigate to main map page
       router.replace("/map");
     } catch (err: any) {
       setError(err.message);
