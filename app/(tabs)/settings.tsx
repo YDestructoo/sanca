@@ -11,7 +11,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 // Icons
-import { User, Mail, Lock, LogOut, Edit3, ChevronRight, Settings } from "lucide-react-native";
+import { User, Lock, LogOut, Edit3, ChevronRight } from "lucide-react-native";
 
 export default function SettingsScreen() {
   const handleChangeEmail = () => {

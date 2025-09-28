@@ -9,7 +9,7 @@ A complete checklist to track progress for the Sanca student tracking system.
 ---
 
 ## Phase 1: Project Setup
-- [ ] **Install Prerequisites**
+- [+] **Install Prerequisites**
   - [+] Node.js LTS installed
   - [+] Firebase project created (Firestore, Auth, Storage enabled)
   - [+] Google Maps API Key generated
@@ -32,28 +32,26 @@ A complete checklist to track progress for the Sanca student tracking system.
   - [+] Add pages: `index.tsx`, `map.tsx`, `logs.tsx`, `settings.tsx`, `student.tsx`
 
 - [~] **Core Components**
-  - [~] Auth | Log-in & Register
-  - [~] Map Screen (Google Maps + real-time markers)
+  - [+] Auth | Log-in & Register
+  - [+] Map Screen (Google Maps + real-time markers)
   - [~] Logs Screen (Location + Voice History)
   - [~] Settings Screen (API keys, backend URL) & Student Details Screen (info + recent activity(Optional))
 
-- [ ] **Integrations**
+- [~] **Integrations**
   - [ ] Firebase Auth for guardian/teacher login
-  - [ ] Firestore for logs and student data
-  - [ ] Firebase Storage for voice files
-  - [ ] Expo Location API for real-time GPS
+  - [~] Firestore for logs and student data
+  - [+] React Native Maps for GPS
 
-- [ ] **Testing**
-  - [ ] Run on Expo Go
-  - [ ] Simulate location and voice logging
-  - [ ] Verify map rendering and data flow
+- [~] **Testing**
+  - [~] Run on Expo Go
+  - [~] Simulate location 
+  - [~] Verify map rendering and data flow
 
 ---
 
-## Phase 3: Backend (Firebase or Node.js)
+## Phase 3: Backend (Firebase)
 - [ ] **Backend Choice**
-  - [ ] Decide: Firebase Cloud Functions OR Node.js Express server
-  - [ ] If Node.js → Setup server + Firestore admin SDK
+  - [+] Decide: Firebase Cloud Functions OR Node.js Express server
 
 - [ ] **Endpoints**
   - [ ] ESP32 → Send location logs
