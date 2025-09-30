@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, ScrollView, KeyboardAvoidingView, Platform, Pressable } from "react-native";
+import { View, ScrollView, KeyboardAvoidingView, Platform, Pressable, Alert } from "react-native";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Text } from "@/components/ui/text";
@@ -127,7 +127,15 @@ export default function LoginScreen() {
 
                 {/* Forgot Password */}
                 <View className="items-start">
-                  <Pressable>
+                  <Pressable
+                    onPress={() => {
+                      Alert.alert(
+                        "Forgot Password",
+                        "Password reset functionality will be available in a future update. Please contact support for assistance.",
+                        [{ text: "OK" }]
+                      );
+                    }}
+                  >
                     <Text className="text-primary font-medium left-2.5 top-1">Forgot Password?</Text>
                   </Pressable>
                 </View>

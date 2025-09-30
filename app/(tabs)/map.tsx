@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { View, Pressable } from "react-native";
+import React, { useState, useEffect, useRef } from "react";
+import { View, Pressable, ScrollView } from "react-native";
 import MapView, { Marker, Circle } from "react-native-maps";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Text } from "@/components/ui/text";
@@ -7,6 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, RefreshCw, Navigation, Clock } from "lucide-react-native";
+import { useAuth } from "@/lib/auth-context";
+import ManualLogger from "@/components/ManualLogger";
+import { formatToPhilippineTime } from "@/lib/time-utils";
 
 // Firebase imports
 import { db } from "@/firebaseConfig";
@@ -18,15 +21,25 @@ interface Location {
 }
 
 export default function MapScreen() {
-  const token = "abc123XYZ"; // TODO: Replace with user token after login
+  const { userProfile } = useAuth();
+  const token = userProfile?.adminToken || userProfile?.uid || "";
   const [location, setLocation] = useState<Location | null>(null);
   const [lastUpdated, setLastUpdated] = useState("");
   const [isRequesting, setIsRequesting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [showManualLogger, setShowManualLogger] = useState(false);
+  const mapRef = useRef<MapView>(null);
 
   // Send command to ESP32
   const sendLocationCommand = async () => {
     try {
+      if (!token) {
+        setError("No user token available");
+        return;
+      }
+      
       setIsRequesting(true);
+      setError(null);
       await setDoc(doc(db, "data", token, "commands", "latest"), {
         command: "getLocation",
         timestamp: new Date().toISOString(),
@@ -34,35 +47,55 @@ export default function MapScreen() {
       console.log("📡 Command sent to ESP32");
     } catch (error) {
       console.error("Error sending command:", error);
+      setError("Failed to send location request");
+    } finally {
+      setIsRequesting(false);
     }
   };
 
   // Listen for latest location log
   useEffect(() => {
-    if (!token) return;
+    if (!token) {
+      setError("No user token available");
+      return;
+    }
 
+    setError(null);
     const logsRef = collection(db, "data", token, "logs");
     const q = query(logsRef, orderBy("timestamp", "desc"), limit(1));
 
     const unsub = onSnapshot(q, (snapshot) => {
-      if (!snapshot.empty) {
-        const latestDoc = snapshot.docs[0];
-        const data = latestDoc.data();
-        console.log("📡 Firestore Data:", data);
+      try {
+        if (!snapshot.empty) {
+          const latestDoc = snapshot.docs[0];
+          const data = latestDoc.data();
+          console.log("📡 Firestore Data:", data);
 
-        const lat = parseFloat(data.latitude);
-        const lng = parseFloat(data.longitude ?? data.longtitude); // fallback typo support
+          const lat = parseFloat(data.latitude);
+          const lng = parseFloat(data.longitude ?? data.longtitude); // fallback typo support
 
-        if (!isNaN(lat) && !isNaN(lng)) {
-          setLocation({ latitude: lat, longitude: lng });
-          setLastUpdated(data.timestamp || new Date().toLocaleTimeString());
+          if (!isNaN(lat) && !isNaN(lng)) {
+            setLocation({ latitude: lat, longitude: lng });
+            setLastUpdated(data.timestamp ? formatToPhilippineTime(data.timestamp) : formatToPhilippineTime(new Date()));
+            setError(null);
+          } else {
+            console.warn("⚠️ Invalid coordinates:", data);
+            setError("Invalid location data received");
+          }
+          setIsRequesting(false);
         } else {
-          console.warn("⚠️ Invalid coordinates:", data);
+          console.log("No logs found for token:", token);
+          setError("No location data available");
         }
+      } catch (err) {
+        console.error("Error processing location data:", err);
+        setError("Failed to load location data");
         setIsRequesting(false);
-      } else {
-        console.log("No logs found for token:", token);
       }
+    }, (err) => {
+      console.error("Firestore error:", err);
+      setError("Failed to connect to database");
+      setIsRequesting(false);
     });
 
     return () => unsub();
@@ -79,6 +112,7 @@ export default function MapScreen() {
       {/* Map */}
       {location && (
         <MapView
+          ref={mapRef}
           style={{ position: "absolute", top: 0, bottom: 0, left: 0, right: 0 }}
           region={{
             latitude: location.latitude,
@@ -122,18 +156,29 @@ export default function MapScreen() {
         </MapView>
       )}
 
-      {/* No location yet */}
-      {!location && (
+      {/* No location yet or error */}
+      {(!location || error) && (
         <View className="flex-1 items-center justify-center bg-muted/20">
           <View className="w-16 h-16 rounded-full bg-primary/10 items-center justify-center mb-4">
             <MapPin className="text-primary" size={32} />
           </View>
           <Text className="text-foreground text-lg font-semibold mb-2">
-            Loading Location...
+            {error ? "Error Loading Location" : "Loading Location..."}
           </Text>
           <Text className="text-muted-foreground text-center px-8">
-            Please wait while we fetch the student's current location
+            {error || "Please wait while we fetch the student's current location"}
           </Text>
+          {error && (
+            <Pressable
+              onPress={() => {
+                setError(null);
+                sendLocationCommand();
+              }}
+              className="bg-primary px-6 py-3 rounded-lg mt-4"
+            >
+              <Text className="text-primary-foreground font-medium">Try Again</Text>
+            </Pressable>
+          )}
         </View>
       )}
 
@@ -153,12 +198,12 @@ export default function MapScreen() {
             </View>
           </CardHeader>
 
-          <CardContent className="pt-0 space-y-3">
+          <CardContent className="pt-0">
             {location ? (
               <>
-                <View className="flex-row space-x-6">
+                <View className="flex-row" style={{ gap: 24 }}>
                   <View className="flex-1">
-                    <Text className="text-muted-foreground text-xs font-medium mb-1">LATITUDE</Text>
+                    <Text className="text-muted-foreground text-xs font-medium mb-2">LATITUDE</Text>
                     <View className="bg-secondary rounded-lg px-3 py-2 border border-border">
                       <Text className="text-secondary-foreground font-mono text-sm">
                         {formatCoordinate(location.latitude)}
@@ -167,7 +212,7 @@ export default function MapScreen() {
                   </View>
 
                   <View className="flex-1">
-                    <Text className="text-muted-foreground text-xs font-medium mb-1">LONGITUDE</Text>
+                    <Text className="text-muted-foreground text-xs font-medium mb-2">LONGITUDE</Text>
                     <View className="bg-secondary rounded-lg px-3 py-2 border border-border">
                       <Text className="text-secondary-foreground font-mono text-sm">
                         {formatCoordinate(location.longitude)}
@@ -176,15 +221,15 @@ export default function MapScreen() {
                   </View>
                 </View>
 
-                <View className="flex-row items-center justify-between pt-2">
-                  <Badge variant="default" className="mr-2">
-                    <Text className="text-xs">Active</Text>
+                <View className="flex-row items-center justify-between mt-4">
+                  <Badge className="bg-green-500 border-green-500">
+                    <Text className="text-xs text-white">Active</Text>
                   </Badge>
                   <Text className="text-muted-foreground text-sm">{getTimeAgo(lastUpdated)}</Text>
                 </View>
               </>
             ) : (
-              <View className="items-center py-4">
+              <View className="items-center py-6">
                 <Text className="text-muted-foreground text-center">Location data unavailable</Text>
               </View>
             )}
@@ -192,7 +237,7 @@ export default function MapScreen() {
         </Card>
 
         {/* Command Button */}
-        <View className="mt-4">
+        <View className="mt-6">
           <Button
             onPress={sendLocationCommand}
             className="w-full h-12 rounded-md"
@@ -207,18 +252,66 @@ export default function MapScreen() {
       </View>
 
       {/* Quick Actions */}
-      <View className="absolute top-8 right-4 space-y-3">
+      <View className="absolute top-8 right-4">
         <Pressable
           onPress={sendLocationCommand}
-          className="w-12 h-12 rounded-full bg-card shadow-lg border border-border items-center justify-center"
+          className="w-12 h-12 rounded-full bg-card shadow-lg border border-border items-center justify-center mb-4"
         >
           <RefreshCw className="text-foreground" size={20} />
         </Pressable>
 
-        <Pressable className="w-12 h-12 rounded-full bg-card shadow-lg border border-border items-center justify-center">
+        <Pressable 
+          onPress={() => setShowManualLogger(true)}
+          className="w-12 h-12 rounded-full bg-primary shadow-lg border border-border items-center justify-center mb-4"
+        >
+          <MapPin className="text-primary-foreground" size={20} />
+        </Pressable>
+
+        <Pressable 
+          onPress={() => {
+            // Center map on current location if available
+            if (location && mapRef.current) {
+              mapRef.current.animateToRegion({
+                latitude: location.latitude,
+                longitude: location.longitude,
+                latitudeDelta: 0.01,
+                longitudeDelta: 0.01,
+              }, 1000);
+            } else {
+              console.log("No location available to center on");
+            }
+          }}
+          className="w-12 h-12 rounded-full bg-card shadow-lg border border-border items-center justify-center"
+        >
           <Navigation className="text-foreground" size={20} />
         </Pressable>
       </View>
+
+      {/* Manual Logger Modal */}
+      {showManualLogger && (
+        <View className="absolute inset-0 bg-black/50 items-center justify-center p-4">
+          <View className="bg-background rounded-lg max-h-[80%] w-full">
+            <View className="flex-row items-center justify-between p-4 border-b border-border">
+              <Text className="text-lg font-semibold">Manual Log Entry</Text>
+              <Pressable
+                onPress={() => setShowManualLogger(false)}
+                className="w-8 h-8 rounded-full bg-muted items-center justify-center"
+              >
+                <Text className="text-foreground">×</Text>
+              </Pressable>
+            </View>
+            <ScrollView className="max-h-96">
+              <ManualLogger 
+                onLogComplete={() => {
+                  setShowManualLogger(false);
+                  // Refresh location data
+                  sendLocationCommand();
+                }}
+              />
+            </ScrollView>
+          </View>
+        </View>
+      )}
     </SafeAreaView>
   );
 }

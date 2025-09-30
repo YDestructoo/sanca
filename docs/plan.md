@@ -2,7 +2,7 @@
 
 ## Description
 A student tracking system where guardians/teachers can track students using IDs integrated with ESP32 devices.  
-The ESP32 sends data to Firebase, and the mobile app displays student locations on Google Maps, logs voice recordings, and allows manual location/voice logging.
+The ESP32 sends data to Firebase, and the mobile app displays student locations on Google Maps and allows manual location logging.
 
 ---
 
@@ -37,8 +37,8 @@ The ESP32 sends data to Firebase, and the mobile app displays student locations 
 ## Core Features
 1. **Student Tracking** – ESP32 sends unique student token to backend.  
 2. **GPS Map** – Real-time location of students displayed on Google Maps.  
-3. **Voice Recording Logs** – Automatic every 30 mins + manual trigger.  
-4. **Manual Logging Button** – Logs location and voice instantly.  
+3. **Location Logging** – Automatic every 30 mins + manual trigger.  
+4. **Manual Logging Button** – Logs location instantly.  
 5. **Guardian/Teacher Dashboard** – View students' location and logs.
 
 ---
@@ -57,14 +57,13 @@ The ESP32 sends data to Firebase, and the mobile app displays student locations 
 |                  | device_id: String                                      |
 |                  | guardian_ids: Array                                    |
 |                  | location_logs: Sub-collection (lat, lng, timestamp)    |
-|                  | voice_logs: Sub-collection (file_url, timestamp)       |
 
 ---
 
 ## Pages & Components
 - **Home Screen:** Overview & quick buttons  
 - **Map Screen:** Real-time location of students  
-- **Logs Screen:** View location + voice history  
+- **Logs Screen:** View location history  
 - **Settings Screen:** API keys, backend URL, and account settings  
 - **Student Details Screen:** Student info & logs  
 
@@ -79,7 +78,7 @@ The ESP32 sends data to Firebase, and the mobile app displays student locations 
 ## Deliverables
 1. Exact terminal commands for frontend setup  
 2. React Native pages and navigation setup using Expo Router  
-3. Firebase integration for location + voice logs  
+3. Firebase integration for location logs  
 4. Code for Google Maps + Location APIs  
 5. Instructions to build APK via Expo EAS  
 

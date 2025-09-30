@@ -4,6 +4,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Text } from "@/components/ui/text";
 import { History } from "lucide-react-native";
 import LogItem from "@/components/Logitem";
+import { useAuth } from "@/lib/auth-context";
+import { formatToPhilippineTime, formatDateLabel } from "@/lib/time-utils";
 
 // Firebase
 import { db } from "@/firebaseConfig";
@@ -38,26 +40,15 @@ const reverseGeocode = async (lat: number, lng: number): Promise<string> => {
   }
 };
 
-// Date Label Formatter
-const formatDateLabel = (dateString?: string) => {
-  if (!dateString) return "";
-  const d = new Date(dateString);
-  if (isNaN(d.getTime())) return dateString;
-  const now = new Date();
-  const msInDay = 24 * 60 * 60 * 1000;
-  const diffDays = Math.floor((now.getTime() - d.getTime()) / msInDay);
-  if (diffDays === 0) return "Today";
-  if (diffDays === 1) return "Yesterday";
-  if (diffDays < 7) return `${diffDays} days ago`;
-  const weeks = Math.floor(diffDays / 7);
-  return weeks === 1 ? "1 week ago" : `${weeks} weeks ago`;
-};
+// Date Label Formatter is now imported from time-utils
 
 export default function LogsScreen() {
-  const token = "abc123XYZ"; // TODO: Replace with dynamic token
+  const { userProfile } = useAuth();
+  const token = userProfile?.adminToken || userProfile?.uid || "";
   const [logs, setLogs] = useState<Log[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [filter, setFilter] = useState<"all" | "today" | "week">("all");
+  const [error, setError] = useState<string | null>(null);
 
   // Filter labels for display
   const filterLabels: Record<typeof filter, string> = {
@@ -68,39 +59,74 @@ export default function LogsScreen() {
 
   // Fetch logs with caching
   useEffect(() => {
+    if (!token) {
+      setError("No user token available");
+      return;
+    }
+
+    setError(null);
     const logsRef = collection(db, "data", token, "logs");
     const q = query(logsRef, orderBy("timestamp", "desc"));
 
+    let isMounted = true;
+
     const unsubscribe = onSnapshot(q, async (snapshot) => {
-      const newLogs: Log[] = [];
+      if (!isMounted) return;
 
-      for (const docSnap of snapshot.docs) {
-        const data = docSnap.data();
-        const lat = parseFloat(data.latitude);
-        const lng = parseFloat(data.longitude);
+      try {
+        const newLogs: Log[] = [];
 
-        let address = data.address;
+        for (const docSnap of snapshot.docs) {
+          const data = docSnap.data();
+          const lat = parseFloat(data.latitude);
+          const lng = parseFloat(data.longitude);
 
-        // Fetch and cache address if missing
-        if (!address && !isNaN(lat) && !isNaN(lng)) {
-          address = await reverseGeocode(lat, lng);
-          await updateDoc(doc(db, "data", token, "logs", docSnap.id), {
-            address: address,
+          let address = data.address;
+
+          // Fetch and cache address if missing
+          if (!address && !isNaN(lat) && !isNaN(lng)) {
+            try {
+              address = await reverseGeocode(lat, lng);
+              if (isMounted) {
+                await updateDoc(doc(db, "data", token, "logs", docSnap.id), {
+                  address: address,
+                });
+              }
+            } catch (geocodeError) {
+              console.warn("Geocoding failed for log:", docSnap.id, geocodeError);
+              address = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+            }
+          }
+
+          newLogs.push({
+            id: docSnap.id,
+            time: data.time || formatToPhilippineTime(data.timestamp),
+            location: address || `${lat}, ${lng}`,
+            date: data.timestamp || new Date().toISOString(),
           });
         }
 
-        newLogs.push({
-          id: docSnap.id,
-          time: data.time || new Date(data.timestamp).toLocaleTimeString(),
-          location: address || `${lat}, ${lng}`,
-          date: data.timestamp || new Date().toISOString(),
-        });
+        if (isMounted) {
+          setLogs(newLogs);
+          setError(null);
+        }
+      } catch (err) {
+        console.error("Error processing logs:", err);
+        if (isMounted) {
+          setError("Failed to load location logs");
+        }
       }
-
-      setLogs(newLogs);
+    }, (err) => {
+      console.error("Firestore error:", err);
+      if (isMounted) {
+        setError("Failed to connect to database");
+      }
     });
 
-    return () => unsubscribe();
+    return () => {
+      isMounted = false;
+      unsubscribe();
+    };
   }, [token]);
 
   // Pull-to-refresh
@@ -144,6 +170,28 @@ export default function LogsScreen() {
     </View>
   );
 
+  // Error State UI
+  const renderErrorState = () => (
+    <View className="flex-1 items-center justify-center py-20">
+      <View className="w-20 h-20 rounded-full bg-destructive/10 items-center justify-center mb-6">
+        <History className="text-destructive" size={36} />
+      </View>
+      <Text className="text-foreground text-xl font-semibold mb-2">Error Loading Data</Text>
+      <Text className="text-muted-foreground text-center px-8 leading-6 mb-4">
+        {error}
+      </Text>
+      <Pressable
+        onPress={() => {
+          setError(null);
+          // Trigger refresh
+        }}
+        className="bg-primary px-6 py-3 rounded-lg"
+      >
+        <Text className="text-primary-foreground font-medium">Try Again</Text>
+      </Pressable>
+    </View>
+  );
+
   return (
     <SafeAreaView className="flex-1 bg-background">
       {/* Filter Tabs */}
@@ -174,7 +222,9 @@ export default function LogsScreen() {
 
       {/* Logs List */}
       <View className="flex-1 px-6">
-        {logs.length === 0 ? (
+        {error ? (
+          renderErrorState()
+        ) : logs.length === 0 ? (
           renderEmptyState()
         ) : (
           <FlatList
@@ -204,16 +254,20 @@ export default function LogsScreen() {
 
       {/* Quick Stats */}
       {logs.length > 0 && (
-        <View className="px-6 py-4 bg-card border-t border-border">
-          <View className="flex-row justify-between items-center">
-            <View className="items-center">
-              <Text className="text-muted-foreground text-xs">TOTAL LOGS</Text>
-              <Text className="text-foreground font-semibold">{logs.length}</Text>
+        <View className="px-1 py-4 bg-card border-t border-border">
+          <View className="flex-row">
+            <View className="flex-1 items-center px-1">
+              <Text className="text-muted-foreground text-xs text-center" numberOfLines={1}>
+                TOTAL LOGS
+              </Text>
+              <Text className="text-foreground font-semibold text-sm mt-1">{logs.length}</Text>
             </View>
 
-            <View className="items-center">
-              <Text className="text-muted-foreground text-xs">THIS WEEK</Text>
-              <Text className="text-foreground font-semibold">
+            <View className="flex-1 items-center px-1">
+              <Text className="text-muted-foreground text-xs text-center" numberOfLines={1}>
+                THIS WEEK
+              </Text>
+              <Text className="text-foreground font-semibold text-sm mt-1">
                 {
                   logs.filter((log) => {
                     if (!log.date) return false;
@@ -226,9 +280,11 @@ export default function LogsScreen() {
               </Text>
             </View>
 
-            <View className="items-center">
-              <Text className="text-muted-foreground text-xs">LAST UPDATE</Text>
-              <Text className="text-foreground font-semibold">
+            <View className="flex-1 items-center px-1">
+              <Text className="text-muted-foreground text-xs text-center" numberOfLines={1}>
+                LAST UPDATED
+              </Text>
+              <Text className="text-foreground font-semibold text-sm mt-1">
                 {logs[0]?.time || "--:--"}
               </Text>
             </View>
