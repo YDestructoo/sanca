@@ -1,5 +1,5 @@
-import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth"; // ✅ just use getAuth now
+import { initializeApp, getApps, getApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -11,7 +11,9 @@ const firebaseConfig = {
   appId: "1:790394992493:android:eb4fac85ed9fedcb760c64"
 };
 
-const app = initializeApp(firebaseConfig);
+// Initialize Firebase app (prevent multiple initializations)
+const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 
+// Initialize Auth (Firebase handles persistence automatically in React Native)
 export const auth = getAuth(app);
 export const db = getFirestore(app);

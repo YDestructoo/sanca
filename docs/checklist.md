@@ -34,7 +34,7 @@ A complete checklist to track progress for the Sanca student tracking system.
 - [~] **Core Components**
   - [+] Auth | Log-in & Register
   - [+] Map Screen (Google Maps + real-time markers)
-  - [~] Logs Screen (Location + Voice History)
+  - [~] Logs Screen (Location History)
   - [~] Settings Screen (API keys, backend URL) & Student Details Screen (info + recent activity(Optional))
 
 - [~] **Integrations**
@@ -55,7 +55,6 @@ A complete checklist to track progress for the Sanca student tracking system.
 
 - [ ] **Endpoints**
   - [ ] ESP32 → Send location logs
-  - [ ] ESP32 → Send voice logs
   - [ ] App → Fetch logs for each student
   - [ ] App → Create/Update student info
 
@@ -67,7 +66,6 @@ A complete checklist to track progress for the Sanca student tracking system.
 ## Phase 4: ESP32 Integration
 - [ ] **Firmware**
   - [ ] Send unique token + location to backend
-  - [ ] Upload voice file via signed URL or REST endpoint
 
 - [ ] **Testing**
   - [ ] Test with mock location data
@@ -87,7 +85,7 @@ A complete checklist to track progress for the Sanca student tracking system.
 
 - [ ] **Final Testing**
   - [ ] End-to-end test with ESP32 + App + Firebase
-  - [ ] Validate location and voice logs in real time
+  - [ ] Validate location logs in real time
 
 ---
 

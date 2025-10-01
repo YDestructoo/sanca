@@ -5,6 +5,7 @@ import { View } from "react-native";
 import { Text } from "@/components/ui/text";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { formatDateLabel } from "@/lib/time-utils";
 
 // Icons
 import { Clock, MapPin } from "lucide-react-native";
@@ -18,19 +19,7 @@ interface LogItemProps {
 }
 
 export default function LogItem({ time, location, date, duration }: LogItemProps) {
-  const formatDateLabel = (dateString?: string) => {
-    if (!dateString) return "";
-    const d = new Date(dateString);
-    if (isNaN(d.getTime())) return dateString;
-    const now = new Date();
-    const msInDay = 24 * 60 * 60 * 1000;
-    const diffDays = Math.floor((now.getTime() - d.getTime()) / msInDay);
-    if (diffDays === 0) return "Today";
-    if (diffDays === 1) return "Yesterday";
-    if (diffDays < 7) return `${diffDays} days ago`;
-    const weeks = Math.floor(diffDays / 7);
-    return weeks === 1 ? "1 week ago" : `${weeks} weeks ago`;
-  };
+  // formatDateLabel is now imported from time-utils
 
   return (
     <Card className="mb-3 shadow-sm border border-border/50">
