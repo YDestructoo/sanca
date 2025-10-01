@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Eye, EyeOff, ArrowRight, LogIn } from "lucide-react-native";
+import { Image } from "react-native";
 
 // Firebase imports
 import { signInWithEmailAndPassword } from "firebase/auth";
@@ -59,16 +60,20 @@ export default function LoginScreen() {
           }}
         >
           <View className="w-full px-6">
-            {/* Header Section */}
-            <View className="items-center mb-4">
-              <View className="w-24 h-24 rounded-3xl bg-primary items-center justify-center shadow-lg mb-5">
-                <LogIn className="text-primary-foreground" size={36} />
-              </View>
-              <Text className="text-4xl font-bold text-foreground mb-2 text-center">Welcome Back</Text>
-              <Text className="text-muted-foreground text-center text-lg px-4 leading-6">
-                Sign in to continue your journey
-              </Text>
+          {/* Header Section */}
+          <View className="items-center mb-4">
+            <View className="w-24 h-24 rounded-3xl items-center justify-center shadow-lg mb-5">
+              <Image 
+                source={require('@/assets/images/adaptive-icon.png')}
+                style={{ width: 300, height: 300 }}
+                resizeMode="contain"
+              />
             </View>
+            <Text className="text-4xl font-bold text-foreground mb-2 text-center">Welcome Back</Text>
+            <Text className="text-muted-foreground text-center text-lg px-4 leading-6">
+              Sign in to continue your journey
+            </Text>
+          </View>
 
             {/* Main Card */}
             <Card className="w-full shadow-lg" style={{ alignSelf: "center", width: "100%", maxWidth: 480 }}>
