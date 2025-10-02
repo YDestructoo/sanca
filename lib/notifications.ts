@@ -26,7 +26,6 @@ export async function notifyEmergency(title: string, body: string) {
     content: {
       title,
       body,
-      // iOS accepts boolean here, Android uses the channel sound above
       sound: true,
     },
     trigger: null,

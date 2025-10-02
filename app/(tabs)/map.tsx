@@ -262,13 +262,6 @@ export default function MapScreen() {
           <RefreshCw color="#000000" size={20} />
         </Pressable>
 
-        <Pressable 
-          onPress={() => setShowManualLogger(true)}
-          className="w-12 h-12 rounded-full shadow-lg border border-border items-center justify-center mb-4"
-          style={{ backgroundColor: '#ffffff' }}
-        >
-          <MapPin color="#000000" size={20} />
-        </Pressable>
 
         <Pressable 
           onPress={() => {
@@ -291,31 +284,6 @@ export default function MapScreen() {
         </Pressable>
       </View>
 
-      {/* Manual Logger Modal */}
-      {showManualLogger && (
-        <View className="absolute inset-0 bg-white/50 items-center justify-center p-4">
-          <View className="bg-background rounded-lg max-h-[80%] w-full">
-            <View className="flex-row items-center justify-between p-4 border-b border-border">
-              <Text className="text-lg font-semibold">Manual Log Entry</Text>
-              <Pressable
-                onPress={() => setShowManualLogger(false)}
-                className="w-8 h-8 rounded-full bg-muted items-center justify-center"
-              >
-                <Text className="text-foreground">×</Text>
-              </Pressable>
-            </View>
-            <ScrollView className="max-h-96">
-              <ManualLogger 
-                onLogComplete={() => {
-                  setShowManualLogger(false);
-                  // Refresh location data
-                  sendLocationCommand();
-                }}
-              />
-            </ScrollView>
-          </View>
-        </View>
-      )}
     </SafeAreaView>
   );
 }
