@@ -1,6 +1,6 @@
 import { Alert } from "react-native";
 import { doc, onSnapshot, updateDoc } from "firebase/firestore";
-import { db } from "@/firebaseConfig";
+import { db } from "@/firebase";
 import { notifyEmergency } from "@/lib/notifications";
 
 // optional: prevent double alerts if Firestore sends same payload twice

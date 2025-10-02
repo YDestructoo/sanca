@@ -2,7 +2,7 @@
 
 ## Description
 A student tracking system where guardians/teachers can track students using IDs integrated with ESP32 devices.  
-The ESP32 sends data to Firebase, and the mobile app displays student locations on Google Maps and allows manual location logging.
+The ESP32 sends data to Firebase, and the mobile app displays student locations on Google Maps.
 
 ---
 
@@ -37,9 +37,8 @@ The ESP32 sends data to Firebase, and the mobile app displays student locations 
 ## Core Features
 1. **Student Tracking** – ESP32 sends unique student token to backend.  
 2. **GPS Map** – Real-time location of students displayed on Google Maps.  
-3. **Location Logging** – Automatic every 30 mins + manual trigger.  
-4. **Manual Logging Button** – Logs location instantly.  
-5. **Guardian/Teacher Dashboard** – View students' location and logs.
+3. **Location Logging** – Automatic every 30 mins.  
+4. **Guardian/Teacher Dashboard** – View students' location and logs.
 
 ---
 

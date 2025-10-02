@@ -12,7 +12,7 @@ import { Image } from "react-native";
 // Firebase imports
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
-import { auth, db } from "@/firebaseConfig"; // adjust path if needed
+import { auth, db } from "@/firebase";
 
 export default function RegisterScreen() {
   const [username, setUsername] = useState("");

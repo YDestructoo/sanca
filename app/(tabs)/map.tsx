@@ -8,11 +8,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, RefreshCw, Navigation, Clock } from "lucide-react-native";
 import { useAuth } from "@/lib/auth-context";
-import ManualLogger from "@/components/ManualLogger";
 import { formatToPhilippineTime } from "@/lib/time-utils";
 
 // Firebase imports
-import { db } from "@/firebaseConfig";
+import { db } from "@/firebase";
 import { collection, doc, setDoc, onSnapshot, query, orderBy, limit } from "firebase/firestore";
 
 interface Location {
@@ -27,7 +26,6 @@ export default function MapScreen() {
   const [lastUpdated, setLastUpdated] = useState("");
   const [isRequesting, setIsRequesting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showManualLogger, setShowManualLogger] = useState(false);
   const mapRef = useRef<MapView>(null);
 
   // Send command to ESP32
@@ -122,6 +120,9 @@ export default function MapScreen() {
           }}
           showsCompass
           showsScale
+          showsUserLocation={false}
+          showsMyLocationButton={false}
+          mapType="standard"
         >
           <Circle
             center={location}
@@ -261,13 +262,6 @@ export default function MapScreen() {
           <RefreshCw color="#000000" size={20} />
         </Pressable>
 
-        <Pressable 
-          onPress={() => setShowManualLogger(true)}
-          className="w-12 h-12 rounded-full shadow-lg border border-border items-center justify-center mb-4"
-          style={{ backgroundColor: '#ffffff' }}
-        >
-          <MapPin color="#000000" size={20} />
-        </Pressable>
 
         <Pressable 
           onPress={() => {
@@ -290,31 +284,6 @@ export default function MapScreen() {
         </Pressable>
       </View>
 
-      {/* Manual Logger Modal */}
-      {showManualLogger && (
-        <View className="absolute inset-0 bg-white/50 items-center justify-center p-4">
-          <View className="bg-background rounded-lg max-h-[80%] w-full">
-            <View className="flex-row items-center justify-between p-4 border-b border-border">
-              <Text className="text-lg font-semibold">Manual Log Entry</Text>
-              <Pressable
-                onPress={() => setShowManualLogger(false)}
-                className="w-8 h-8 rounded-full bg-muted items-center justify-center"
-              >
-                <Text className="text-foreground">×</Text>
-              </Pressable>
-            </View>
-            <ScrollView className="max-h-96">
-              <ManualLogger 
-                onLogComplete={() => {
-                  setShowManualLogger(false);
-                  // Refresh location data
-                  sendLocationCommand();
-                }}
-              />
-            </ScrollView>
-          </View>
-        </View>
-      )}
     </SafeAreaView>
   );
 }

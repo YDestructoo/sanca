@@ -6,7 +6,7 @@ import { Text } from "@/components/ui/text";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { formatDateLabel } from "@/lib/time-utils";
-
+   
 // Icons
 import { Clock, MapPin } from "lucide-react-native";
 
