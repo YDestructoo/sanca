@@ -1,18 +1,100 @@
 import React, { useState, useEffect, useRef } from "react";
-import { View, Pressable, ScrollView } from "react-native";
+import { View, Pressable, ScrollView, useColorScheme } from "react-native";
 import MapView, { Marker, Circle } from "react-native-maps";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Text } from "@/components/ui/text";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, RefreshCw, Navigation, Clock } from "lucide-react-native";
+import { ThemedIcon } from "@/components/ui/ThemeIcon";
 import { useAuth } from "@/lib/auth-context";
 import { formatToPhilippineTime } from "@/lib/time-utils";
 
 // Firebase imports
 import { db } from "@/firebase";
 import { collection, doc, setDoc, onSnapshot, query, orderBy, limit } from "firebase/firestore";
+
+// Dark mode map style
+const darkMapStyle = [
+  { elementType: "geometry", stylers: [{ color: "#242f3e" }] },
+  { elementType: "labels.text.stroke", stylers: [{ color: "#242f3e" }] },
+  { elementType: "labels.text.fill", stylers: [{ color: "#746855" }] },
+  {
+    featureType: "administrative.locality",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#d59563" }],
+  },
+  {
+    featureType: "poi",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#d59563" }],
+  },
+  {
+    featureType: "poi.park",
+    elementType: "geometry",
+    stylers: [{ color: "#263c3f" }],
+  },
+  {
+    featureType: "poi.park",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#6b9a76" }],
+  },
+  {
+    featureType: "road",
+    elementType: "geometry",
+    stylers: [{ color: "#38414e" }],
+  },
+  {
+    featureType: "road",
+    elementType: "geometry.stroke",
+    stylers: [{ color: "#212a37" }],
+  },
+  {
+    featureType: "road",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#9ca5b3" }],
+  },
+  {
+    featureType: "road.highway",
+    elementType: "geometry",
+    stylers: [{ color: "#746855" }],
+  },
+  {
+    featureType: "road.highway",
+    elementType: "geometry.stroke",
+    stylers: [{ color: "#1f2835" }],
+  },
+  {
+    featureType: "road.highway",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#f3d19c" }],
+  },
+  {
+    featureType: "transit",
+    elementType: "geometry",
+    stylers: [{ color: "#2f3948" }],
+  },
+  {
+    featureType: "transit.station",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#d59563" }],
+  },
+  {
+    featureType: "water",
+    elementType: "geometry",
+    stylers: [{ color: "#17263c" }],
+  },
+  {
+    featureType: "water",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#515c6d" }],
+  },
+  {
+    featureType: "water",
+    elementType: "labels.text.stroke",
+    stylers: [{ color: "#17263c" }],
+  },
+];
 
 interface Location {
   latitude: number;
@@ -21,6 +103,8 @@ interface Location {
 
 export default function MapScreen() {
   const { userProfile } = useAuth();
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === "dark";
   const token = userProfile?.adminToken || userProfile?.uid || "";
   const [location, setLocation] = useState<Location | null>(null);
   const [lastUpdated, setLastUpdated] = useState("");
@@ -118,6 +202,7 @@ export default function MapScreen() {
             latitudeDelta: 0.05,
             longitudeDelta: 0.05,
           }}
+          customMapStyle={isDark ? darkMapStyle : []}
           showsCompass
           showsScale
           showsUserLocation={false}
@@ -127,29 +212,34 @@ export default function MapScreen() {
           <Circle
             center={location}
             radius={40}
-            fillColor="rgba(0,122,255,0.12)"
-            strokeColor="rgba(0,122,255,0.25)"
-            strokeWidth={1}
+            fillColor={isDark ? "rgba(59,130,246,0.15)" : "rgba(0,122,255,0.12)"}
+            strokeColor={isDark ? "rgba(59,130,246,0.3)" : "rgba(0,122,255,0.25)"}
+            strokeWidth={1.5}
           />
           <Marker coordinate={location} title="Student Location" description={getTimeAgo(lastUpdated)}>
             <View
               style={{
-                width: 28,
-                height: 28,
-                borderRadius: 14,
-                backgroundColor: "rgba(0,122,255,0.25)",
+                width: 32,
+                height: 32,
+                borderRadius: 16,
+                backgroundColor: isDark ? "rgba(59,130,246,0.3)" : "rgba(0,122,255,0.25)",
                 alignItems: "center",
                 justifyContent: "center",
-                borderWidth: 1.5,
-                borderColor: "#007AFF",
+                borderWidth: 2,
+                borderColor: isDark ? "#3b82f6" : "#007AFF",
+                shadowColor: "#000",
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.25,
+                shadowRadius: 3.84,
+                elevation: 5,
               }}
             >
               <View
                 style={{
-                  width: 10,
-                  height: 10,
-                  borderRadius: 5,
-                  backgroundColor: "#007AFF",
+                  width: 12,
+                  height: 12,
+                  borderRadius: 6,
+                  backgroundColor: isDark ? "#3b82f6" : "#007AFF",
                 }}
               />
             </View>
@@ -159,14 +249,14 @@ export default function MapScreen() {
 
       {/* No location yet or error */}
       {(!location || error) && (
-        <View className="flex-1 items-center justify-center bg-muted/20">
-          <View className="w-16 h-16 rounded-full bg-primary/10 items-center justify-center mb-4">
-            <MapPin className="text-primary" size={32} />
+        <View className="flex-1 items-center justify-center bg-muted/30">
+          <View className="w-20 h-20 rounded-full bg-primary/10 items-center justify-center mb-4">
+            <ThemedIcon name="MapPin" size={36} colorKey="primary" />
           </View>
-          <Text className="text-foreground text-lg font-semibold mb-2">
+          <Text className="text-foreground text-xl font-semibold mb-2">
             {error ? "Error Loading Location" : "Loading Location..."}
           </Text>
-          <Text className="text-muted-foreground text-center px-8">
+          <Text className="text-muted-foreground text-center px-8 mb-4">
             {error || "Please wait while we fetch the student's current location"}
           </Text>
           {error && (
@@ -175,9 +265,9 @@ export default function MapScreen() {
                 setError(null);
                 sendLocationCommand();
               }}
-              className="bg-primary px-6 py-3 rounded-lg mt-4"
+              className="bg-primary px-8 py-3 rounded-lg active:opacity-80"
             >
-              <Text className="text-primary-foreground font-medium">Try Again</Text>
+              <Text className="text-primary-foreground font-semibold">Try Again</Text>
             </Pressable>
           )}
         </View>
@@ -185,16 +275,16 @@ export default function MapScreen() {
 
       {/* Info Panel */}
       <View className="absolute bottom-6 left-4 right-4">
-        <Card className="shadow-xl border-0 bg-card/95 backdrop-blur-sm">
+        <Card className="shadow-2xl border border-border/50">
           <CardHeader className="pb-3">
             <View className="flex-row items-center justify-between">
               <View className="flex-row items-center">
-                <Navigation className="text-primary mr-2" size={20} />
-                <CardTitle className="text-lg text-foreground">Current Location</CardTitle>
+                <ThemedIcon name="Navigation" size={20} colorKey="primary" />
+                <Text className="text-lg font-semibold text-foreground ml-2">Current Location</Text>
               </View>
               <View className="flex-row items-center">
-                <Clock className="text-muted-foreground mr-2" size={16} />
-                <Text className="text-muted-foreground text-sm">{lastUpdated || "No data"}</Text>
+                <ThemedIcon name="Clock" size={16} colorKey="mutedForeground" />
+                <Text className="text-muted-foreground text-xs ml-2">{lastUpdated || "No data"}</Text>
               </View>
             </View>
           </CardHeader>
@@ -202,52 +292,57 @@ export default function MapScreen() {
           <CardContent className="pt-0">
             {location ? (
               <>
-                <View className="flex-row" style={{ gap: 24 }}>
+                <View className="flex-row" style={{ gap: 12 }}>
                   <View className="flex-1">
-                    <Text className="text-muted-foreground text-xs font-medium mb-2">LATITUDE</Text>
-                    <View className="bg-secondary rounded-lg px-3 py-2 border border-border">
-                      <Text className="text-secondary-foreground font-mono text-sm">
+                    <Text className="text-muted-foreground text-xs font-semibold mb-2 tracking-wider">LATITUDE</Text>
+                    <View className="bg-muted/50 rounded-lg px-3 py-3 border border-border/50">
+                      <Text className="text-foreground font-mono text-sm font-medium">
                         {formatCoordinate(location.latitude)}
                       </Text>
                     </View>
                   </View>
 
                   <View className="flex-1">
-                    <Text className="text-muted-foreground text-xs font-medium mb-2">LONGITUDE</Text>
-                    <View className="bg-secondary rounded-lg px-3 py-2 border border-border">
-                      <Text className="text-secondary-foreground font-mono text-sm">
+                    <Text className="text-muted-foreground text-xs font-semibold mb-2 tracking-wider">LONGITUDE</Text>
+                    <View className="bg-muted/50 rounded-lg px-3 py-3 border border-border/50">
+                      <Text className="text-foreground font-mono text-sm font-medium">
                         {formatCoordinate(location.longitude)}
                       </Text>
                     </View>
                   </View>
                 </View>
 
-                <View className="flex-row items-center justify-between mt-4">
-                  <Badge className="bg-green-500 border-green-500">
-                    <Text className="text-xs text-white">Active</Text>
-                  </Badge>
-                  <Text className="text-muted-foreground text-sm">{getTimeAgo(lastUpdated)}</Text>
+                <View className="flex-row items-center justify-between mt-4 pt-3 border-t border-border/50">
+                  <View className="flex-row items-center">
+                    <View className="w-2 h-2 rounded-full bg-green-500 mr-2" />
+                    <Text className="text-green-600 dark:text-green-400 text-xs font-semibold">ACTIVE</Text>
+                  </View>
+                  <Text className="text-muted-foreground text-xs">{getTimeAgo(lastUpdated)}</Text>
                 </View>
               </>
             ) : (
-              <View className="items-center py-6">
-                <Text className="text-muted-foreground text-center">Location data unavailable</Text>
+              <View className="items-center py-8">
+                <ThemedIcon name="MapPin" size={32} colorKey="mutedForeground" />
+                <Text className="text-muted-foreground text-center mt-3">Location data unavailable</Text>
               </View>
             )}
           </CardContent>
         </Card>
 
         {/* Command Button */}
-        <View className="mt-6">
+        <View className="mt-4">
           <Button
             onPress={sendLocationCommand}
-            className="w-full h-12 rounded-md"
+            className="w-full h-13 rounded-xl shadow-lg"
             size="default"
             disabled={isRequesting}
           >
-            <Text className="text-primary-foreground font-semibold">
-              {isRequesting ? "Requesting..." : "GET GPS LOCATION"}
-            </Text>
+            <View className="flex-row items-center">
+              <ThemedIcon name="RefreshCw" size={18} colorKey="primaryForeground" />
+              <Text className="text-primary-foreground font-bold text-base ml-2">
+                {isRequesting ? "REQUESTING..." : "GET GPS LOCATION"}
+              </Text>
+            </View>
           </Button>
         </View>
       </View>
@@ -256,12 +351,10 @@ export default function MapScreen() {
       <View className="absolute top-8 right-4">
         <Pressable
           onPress={sendLocationCommand}
-          className="w-12 h-12 rounded-full shadow-lg border border-border items-center justify-center mb-4"
-          style={{ backgroundColor: '#ffffff' }}
+          className="w-12 h-12 rounded-full shadow-lg border border-border bg-card items-center justify-center mb-4 active:opacity-70"
         >
-          <RefreshCw color="#000000" size={20} />
+          <ThemedIcon name="RefreshCw" size={20} colorKey="foreground" />
         </Pressable>
-
 
         <Pressable 
           onPress={() => {
@@ -277,13 +370,11 @@ export default function MapScreen() {
               console.log("No location available to center on");
             }
           }}
-          className="w-12 h-12 rounded-full shadow-lg border border-border items-center justify-center"
-          style={{ backgroundColor: '#ffffff' }}
+          className="w-12 h-12 rounded-full shadow-lg border border-border bg-card items-center justify-center active:opacity-70"
         >
-          <Navigation color="#000000" size={20} />
+          <ThemedIcon name="Navigation" size={20} colorKey="foreground" />
         </Pressable>
       </View>
-
     </SafeAreaView>
   );
 }

@@ -1,13 +1,12 @@
 import React, { useState } from "react";
-import { View, ScrollView, KeyboardAvoidingView, Platform, Pressable } from "react-native";
+import { View, ScrollView, KeyboardAvoidingView, Platform, Pressable, Image, useColorScheme } from "react-native";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Text } from "@/components/ui/text";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Eye, EyeOff, ArrowRight, UserPlus, Key } from "lucide-react-native";
-import { Image } from "react-native";
+import { ThemedIcon } from "@/components/ui/ThemeIcon";
 
 // Firebase imports
 import { createUserWithEmailAndPassword } from "firebase/auth";
@@ -25,6 +24,8 @@ export default function RegisterScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [showToken, setShowToken] = useState(false);
   const router = useRouter();
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === "dark";
 
   const handleRegister = async () => {
     if (!username || !email || !password || !token || !studentName) {
@@ -86,20 +87,24 @@ export default function RegisterScreen() {
           contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', alignItems: 'center', paddingVertical: 24 }}
         >
           <View className="w-full px-6">
-          {/* Header Section */}
-          <View className="items-center mb-4">
-            <View className="w-24 h-24 rounded-3xl items-center justify-center shadow-lg mb-5" style={{ backgroundColor: '#ffffff' }}>
-              <Image 
-                source={require('@/assets/images/adaptive-icon.png')}
-                style={{ width: 300, height: 300 }}
-                resizeMode="contain"
-              />
+            {/* Header Section */}
+            <View className="items-center mb-8">
+              <View className="w-32 h-32 rounded-3xl items-center justify-center mb-6">
+                <Image 
+                  source={
+                    isDark 
+                      ? require('@/assets/images/adaptive-icon-light-mode.png')
+                      : require('@/assets/images/adaptive-icon.png')
+                  }
+                  style={{ width: 300, height: 300 }}
+                  resizeMode="contain"
+                />
+              </View>
+              <Text className="text-4xl font-bold text-foreground mb-2 text-center">Create Account</Text>
+              <Text className="text-muted-foreground text-center text-lg px-4 leading-6">
+                Join us to start your journey
+              </Text>
             </View>
-            <Text className="text-4xl font-bold text-foreground mb-2 text-center">Create Account</Text>
-            <Text className="text-muted-foreground text-center text-lg px-4 leading-6">
-              Join us to start your journey
-            </Text>
-          </View>
 
             {/* Main Card */}
             <Card className="w-full shadow-lg" style={{ alignSelf: 'center', width: '100%', maxWidth: 480 }}>
@@ -174,9 +179,9 @@ export default function RegisterScreen() {
                       className="absolute right-4 top-3.5"
                     >
                       {showPassword ? (
-                        <EyeOff size={20} className="text-muted-foreground" />
+                        <ThemedIcon name="EyeOff" size={20} colorKey="mutedForeground" />
                       ) : (
-                        <Eye size={20} className="text-muted-foreground" />
+                        <ThemedIcon name="Eye" size={20} colorKey="mutedForeground" />
                       )}
                     </Pressable>
                   </View>
@@ -198,11 +203,11 @@ export default function RegisterScreen() {
                       onPress={() => setShowToken(!showToken)}
                       className="absolute right-4 top-3.5"
                     >
-                      {showToken ? (
-                        <Key size={20} className="text-muted-foreground" />
-                      ) : (
-                        <Key size={20} className="text-muted-foreground opacity-60" />
-                      )}
+                      <ThemedIcon 
+                        name="Key" 
+                        size={20} 
+                        colorKey="mutedForeground"
+                      />
                     </Pressable>
                   </View>
                 </View>
@@ -218,7 +223,7 @@ export default function RegisterScreen() {
                     <Text className="text-primary-foreground font-semibold text-base mr-2">
                       {isLoading ? "Creating Account..." : "Create Account"}
                     </Text>
-                    {!isLoading && <ArrowRight size={16} className="text-primary-foreground" />}
+                    {!isLoading && <ThemedIcon name="ArrowRight" size={16} colorKey="primaryForeground" />}
                   </View>
                 </Button>
               </CardContent>

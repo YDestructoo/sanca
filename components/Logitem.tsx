@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { formatDateLabel } from "@/lib/time-utils";
    
 // Icons
-import { Clock, MapPin } from "lucide-react-native";
+import { ThemedIcon } from "@/components/ui/ThemeIcon";
 
 interface LogItemProps {
   time: string;
@@ -29,7 +29,7 @@ export default function LogItem({ time, location, date, duration }: LogItemProps
           <View className="flex-row items-center justify-between mb-2">
             <View className="flex-row items-center" style={{ gap: 8 }}> 
               {/* Gap works like spacing between children */}
-              <Clock className="text-primary" size={18} />
+              <ThemedIcon name="Clock" size={18} colorKey="primary" />
               <Text className="text-foreground font-semibold text-lg">{time}</Text>
             </View>
             {date && (
@@ -46,7 +46,6 @@ export default function LogItem({ time, location, date, duration }: LogItemProps
 
           {/* Location Row */}
           <View className="flex-row items-start mt-1" style={{ gap: 8 }}>
-  
             <Text className="text-foreground text-sm flex-1 font-medium">
               {location}
             </Text>

@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/lib/auth-context";
 import { setupNotifications } from "@/lib/notifications";
 import { listenEmergency } from "@/lib/emergencyListener";
-import { Bell } from "lucide-react-native";
+import { ThemedIcon } from "@/components/ui/ThemeIcon";
 
 const PREF_KEY = "@sanca:emergencyEnabled";
 
@@ -56,7 +56,7 @@ export default function EmergencyAlertsToggle() {
         <View className="flex-row items-center justify-between">
           <View className="flex-row items-center flex-1 mr-4">
             <View className="w-10 h-10 items-center justify-center mr-4">
-              <Bell className="text-primary" size={24} />
+              <ThemedIcon name="Bell" size={24} colorKey="primary" />
             </View>
             <View className="flex-1">
               <Text className="text-foreground font-medium">

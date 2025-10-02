@@ -4,6 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { useAuth } from "@/lib/auth-context";
 import EmergencyAlertsToggle from "@/components/EmergencyAlertsToggle";
+import { Image, useColorScheme } from "react-native";
 
 // React Native Reusables imports
 import { Text } from "@/components/ui/text";
@@ -12,11 +13,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 // Icons
-import { User, Lock, LogOut, Edit3, ChevronRight, X, Eye, EyeOff } from "lucide-react-native";
+import { ThemedIcon } from "@/components/ui/ThemeIcon";
 
 export default function SettingsScreen() {
   const { user, userProfile, signOut } = useAuth();
   const router = useRouter();
+
+  // Theme
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === "dark";
   
   // Modal states
   const [showUsernameModal, setShowUsernameModal] = useState(false);
@@ -94,8 +99,6 @@ export default function SettingsScreen() {
 
     setIsLoading(true);
     try {
-      // TODO: Implement actual password update in Firebase
-      // For now, simulate the update
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       Alert.alert("Success", "Password updated successfully.");
@@ -146,8 +149,16 @@ export default function SettingsScreen() {
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View className="flex-row items-center px-6 py-4 bg-card border-b border-border">
-          <View className="w-12 h-12 rounded-2xl bg-muted items-center justify-center mr-4">
-            <Text className="text-foreground font-bold text-xl">S</Text>
+          <View className="w-14 h-14 rounded-2xl items-center justify-center mr-1">
+            <Image 
+              source={
+                isDark 
+                  ? require('@/assets/images/adaptive-icon-light-mode.png')
+                  : require('@/assets/images/adaptive-icon.png')
+              }
+              style={{ width: 100, height: 100 }}
+              resizeMode="contain"
+            />
           </View>
           <Text className="text-foreground font-bold text-3xl">Sanca</Text>
         </View>
@@ -178,7 +189,7 @@ export default function SettingsScreen() {
                   className="w-12 h-12 rounded-lg items-center justify-center active:scale-95 border border-border"
                   style={{ backgroundColor: 'rgba(255,75,110,0.1)' }}
                 >
-                  <LogOut color="#FF5A7D" size={20} />
+                  <ThemedIcon name="LogOut" size={20} colorKey="destructive" />
                 </Pressable>
               </View>
             </CardContent>
@@ -213,7 +224,7 @@ export default function SettingsScreen() {
                 <Pressable
                   onPress={handleChangeUsername}
                   className="w-10 h-10 items-center justify-center active:scale-95">
-                  <Edit3 className="text-secondary-foreground" size={18} />
+                  <ThemedIcon name="Edit3" size={18} colorKey="secondaryForeground" />
                 </Pressable>
               </View>
             </CardContent>
@@ -226,24 +237,25 @@ export default function SettingsScreen() {
                 <View className="flex-row items-center justify-between">
                   <View className="flex-row items-center flex-1">
                     <View className="w-10 h-10 items-center justify-center mr-4">
-                      <Lock className="text-primary" size={24} />
+                      <ThemedIcon name="Lock" size={24} colorKey="primary" />
                     </View>
                     <Text className="text-foreground font-medium">
                       Change Password
                     </Text>
                   </View>
-                    <View className="w-10 h-10 items-center justify-center">
-                      <ChevronRight className="text-muted-foreground" size={20} />
-                    </View>
+                  <View className="w-10 h-10 items-center justify-center">
+                    <ThemedIcon name="ChevronRight" size={20} colorKey="mutedForeground" />
+                  </View>
                 </View>
               </CardContent>
             </Card>
+          </Pressable>
 
-          {/* Emergency Alerts Toggle - NOW OUTSIDE THE PRESSABLE */}  
+          {/* Emergency Alerts Toggle */}  
           <View className="mt-6">
             <EmergencyAlertsToggle />
           </View>
-          </Pressable>
+
           {/* Footer */}
           <View className="mt-12 pt-8 border-t border-border">
             <Text className="text-muted-foreground text-center text-xs">
@@ -269,7 +281,7 @@ export default function SettingsScreen() {
               onPress={() => setShowUsernameModal(false)}
               className="w-8 h-8 rounded-full bg-muted items-center justify-center"
             >
-              <X size={20} />
+              <ThemedIcon name="X" size={20} colorKey="foreground" />
             </Pressable>
           </View>
           
@@ -320,7 +332,7 @@ export default function SettingsScreen() {
               onPress={() => setShowPasswordModal(false)}
               className="w-8 h-8 rounded-full bg-muted items-center justify-center"
             >
-              <X size={20} />
+              <ThemedIcon name="X" size={20} colorKey="foreground" />
             </Pressable>
           </View>
           
@@ -341,7 +353,11 @@ export default function SettingsScreen() {
                     onPress={() => setShowCurrentPassword(!showCurrentPassword)}
                     className="absolute right-3 top-3"
                   >
-                    {showCurrentPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                    {showCurrentPassword ? (
+                      <ThemedIcon name="EyeOff" size={20} colorKey="mutedForeground" />
+                    ) : (
+                      <ThemedIcon name="Eye" size={20} colorKey="mutedForeground" />
+                    )}
                   </Pressable>
                 </View>
               </View>
@@ -361,7 +377,11 @@ export default function SettingsScreen() {
                     onPress={() => setShowNewPassword(!showNewPassword)}
                     className="absolute right-3 top-3"
                   >
-                    {showNewPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                    {showNewPassword ? (
+                      <ThemedIcon name="EyeOff" size={20} colorKey="mutedForeground" />
+                    ) : (
+                      <ThemedIcon name="Eye" size={20} colorKey="mutedForeground" />
+                    )}
                   </Pressable>
                 </View>
               </View>
@@ -381,7 +401,11 @@ export default function SettingsScreen() {
                     onPress={() => setShowConfirmPassword(!showConfirmPassword)}
                     className="absolute right-3 top-3"
                   >
-                    {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                    {showConfirmPassword ? (
+                      <ThemedIcon name="EyeOff" size={20} colorKey="mutedForeground" />
+                    ) : (
+                      <ThemedIcon name="Eye" size={20} colorKey="mutedForeground" />
+                    )}
                   </Pressable>
                 </View>
               </View>
