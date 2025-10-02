@@ -10,7 +10,7 @@ import { Eye, EyeOff, ArrowRight, LogIn } from "lucide-react-native";
 
 // Firebase imports
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "@/firebaseConfig"; // Adjust this path if needed
+import { auth } from "@/firebase";
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");

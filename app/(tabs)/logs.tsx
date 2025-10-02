@@ -8,7 +8,7 @@ import { useAuth } from "@/lib/auth-context";
 import { formatToPhilippineTime, formatDateLabel } from "@/lib/time-utils";
 
 // Firebase
-import { db } from "@/firebaseConfig";
+import { db } from "@/firebase";
 import { collection, onSnapshot, query, orderBy, doc, updateDoc } from "firebase/firestore";
 
 interface Log {
