@@ -256,11 +256,19 @@ export default function MapScreen() {
       <View className="absolute top-8 right-4">
         <Pressable
           onPress={sendLocationCommand}
-          className="w-12 h-12 rounded-full bg-card shadow-lg border border-border items-center justify-center mb-4"
+          className="w-12 h-12 rounded-full shadow-lg border border-border items-center justify-center mb-4"
+          style={{ backgroundColor: '#ffffff' }}
         >
-          <RefreshCw className="text-foreground" size={20} />
+          <RefreshCw color="#000000" size={20} />
         </Pressable>
 
+        <Pressable 
+          onPress={() => setShowManualLogger(true)}
+          className="w-12 h-12 rounded-full shadow-lg border border-border items-center justify-center mb-4"
+          style={{ backgroundColor: '#ffffff' }}
+        >
+          <MapPin color="#000000" size={20} />
+        </Pressable>
 
         <Pressable 
           onPress={() => {
@@ -276,12 +284,38 @@ export default function MapScreen() {
               console.log("No location available to center on");
             }
           }}
-          className="w-12 h-12 rounded-full bg-card shadow-lg border border-border items-center justify-center"
+          className="w-12 h-12 rounded-full shadow-lg border border-border items-center justify-center"
+          style={{ backgroundColor: '#ffffff' }}
         >
-          <Navigation className="text-foreground" size={20} />
+          <Navigation color="#000000" size={20} />
         </Pressable>
       </View>
 
+      {/* Manual Logger Modal */}
+      {showManualLogger && (
+        <View className="absolute inset-0 bg-white/50 items-center justify-center p-4">
+          <View className="bg-background rounded-lg max-h-[80%] w-full">
+            <View className="flex-row items-center justify-between p-4 border-b border-border">
+              <Text className="text-lg font-semibold">Manual Log Entry</Text>
+              <Pressable
+                onPress={() => setShowManualLogger(false)}
+                className="w-8 h-8 rounded-full bg-muted items-center justify-center"
+              >
+                <Text className="text-foreground">×</Text>
+              </Pressable>
+            </View>
+            <ScrollView className="max-h-96">
+              <ManualLogger 
+                onLogComplete={() => {
+                  setShowManualLogger(false);
+                  // Refresh location data
+                  sendLocationCommand();
+                }}
+              />
+            </ScrollView>
+          </View>
+        </View>
+      )}
     </SafeAreaView>
   );
 }

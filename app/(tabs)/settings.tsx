@@ -3,6 +3,7 @@ import { View, ScrollView, Pressable, Alert, Modal, TextInput } from "react-nati
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { useAuth } from "@/lib/auth-context";
+import EmergencyAlertsToggle from "@/components/EmergencyAlertsToggle";
 
 // React Native Reusables imports
 import { Text } from "@/components/ui/text";
@@ -237,6 +238,11 @@ export default function SettingsScreen() {
                 </View>
               </CardContent>
             </Card>
+
+          {/* Emergency Alerts Toggle - NOW OUTSIDE THE PRESSABLE */}  
+          <View className="mt-6">
+            <EmergencyAlertsToggle />
+          </View>
           </Pressable>
           {/* Footer */}
           <View className="mt-12 pt-8 border-t border-border">
